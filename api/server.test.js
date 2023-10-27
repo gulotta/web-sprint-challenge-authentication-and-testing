@@ -8,7 +8,7 @@ const {BCRYPT_ROUNDS} = require('./../config')
 const noUser = {username: "", password: "abcd"}
 const noPass = {username: "foo", password: ""}
 
-const user1 = {username: "foo", password: "abcd"}
+const user1 = {username: "Mike", password: "abcd"}
 
 beforeEach(async () => {
   await db.migrate.rollback()
@@ -45,7 +45,7 @@ describe("[POST] registration", () => {
     .post("/api/auth/register")
     .send(user1)
     const [user] = await db('users').where({username: user1.username})
-    expect(user).toMatchObject({username: "foo"})
+    expect(user).toMatchObject({username: "Mike"})
   })
 })
 
@@ -61,7 +61,7 @@ describe("[POST] login", () => {
     const res = await request(server)
     .post("/api/auth/login")
     .send(user1)
-    expect(res.body.message).toBe("Welcome, foo!")
+    expect(res.body.message).toBe("Welcome, Mike")
   })
   it("User cannot login without a password", async () => {
     const res = await request(server)
@@ -80,17 +80,19 @@ describe("[GET] Jokes", () => {
     })
   })
   it("No token, no jokes", async () => {
-    const res = await request(server).get("/api/jokes")
-    expect(res.body.message).toBe("token required")
-  })
+    const res = await request(server).get("/api/jokes");
+    expect(res.body.message).toBe("token required");
+  });
   it("With a token, you get jokes", async () => {
-    let res = (await request(server).post("/api/auth/login")).set(user1)
+    let res = await request(server).post("/api/auth/login").send(user1);
     res = await request(server)
     .get("/api/jokes")
-    .set("Authorization", res.body.token)
-    expect(res.body).toMatchObject(jokes)
+    .set({authorization: res.body.token});
+    expect(res.body).toMatchObject(jokes);
   })
 })
+
+
 
 
 
