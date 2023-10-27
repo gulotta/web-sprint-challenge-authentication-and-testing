@@ -85,7 +85,7 @@ router.post('/register', checkBody, userNameFree, (req, res) => {
   */
 
 
-router.post('/login', checkBody, userNameExists, (req, res) => {
+router.post('/login', checkBody, userNameExists, (req, res, next) => {
   let {username, password} = req.body
   User.findBy({username})
   .then((user) => {
@@ -98,8 +98,8 @@ router.post('/login', checkBody, userNameExists, (req, res) => {
   } else {
     if(!username) {
       res.status(401).json({message: "invalid credentials"})
-    }
-  }
+    } 
+  } next()
 })
 })
 
