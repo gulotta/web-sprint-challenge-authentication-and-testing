@@ -38,18 +38,6 @@ const {tokenBuilder} = require('./auth-helper')
   */
 
 
-// router.post('/register', checkBody, userNameFree, async (req, res, next) => {
-//   let user = req.body;
-//   const hash = bcrypt.hashSync(user.password, BCRYPT_ROUNDS);
-//   user.password = hash;
-//   try {
-//     const newUser = await User.add(user);
-//     res.status(201).json(newUser);
-//   } catch(err) {
-//     next(err)
-//   }
-// });
-
 router.post('/register', checkBody, userNameFree, (req, res) => {
   const {username, password} = req.body
 
@@ -94,16 +82,6 @@ router.post('/register', checkBody, userNameFree, (req, res) => {
   */
 
 
-// router.post('/login', checkBody, userNameExists, (req, res, next) => {
-//  if (bcrypt.compareSync(req.body.password)) {
-//   const token = tokenBuilder(req.body)
-//   res.status(200).json({ message: `Welcome, ${req.body.username}`, token})
-//  } else {
-//   next({status: 401, message: 'invalid credentials'})
-//  }
-  
-// });
-
 router.post('/login', checkBody, userNameExists, (req, res) => {
   let {username, password} = req.body
   User.findBy({username})
@@ -111,7 +89,7 @@ router.post('/login', checkBody, userNameExists, (req, res) => {
     if (user && bcrypt.compareSync(password, user.password)) {
       const token = tokenBuilder(user)
       res.status(200).json({
-        message: `Welcome, ${req.body.username}`, 
+        message: `Welcome, ${user.username}`, 
         token: token
     })
   } else {
