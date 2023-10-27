@@ -1,8 +1,17 @@
 const router = require('express').Router();
+const User = require('../users/users-model')
+const bcrypt = require('bcryptjs')
+const {
+  checkBody,
+  userNameFree,
+  userNameExists
+} = require('./auth-middleware')
+const {BCRYPT_ROUNDS} = require('../../config/index')
+const {tokenBuilder} = require('./auth-helper')
 
-router.post('/register', (req, res) => {
-  res.end('implement register, please!');
-  /*
+
+
+/*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
     DO NOT EXCEED 2^8 ROUNDS OF HASHING!
@@ -27,11 +36,40 @@ router.post('/register', (req, res) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-});
 
-router.post('/login', (req, res) => {
-  res.end('implement login, please!');
-  /*
+
+// router.post('/register', checkBody, userNameFree, async (req, res, next) => {
+//   let user = req.body;
+//   const hash = bcrypt.hashSync(user.password, BCRYPT_ROUNDS);
+//   user.password = hash;
+//   try {
+//     const newUser = await User.add(user);
+//     res.status(201).json(newUser);
+//   } catch(err) {
+//     next(err)
+//   }
+// });
+
+router.post('/register', checkBody, userNameFree, (req, res) => {
+  const {username, password} = req.body
+
+  const hash = bcrypt.hashSync(password, BCRYPT_ROUNDS)
+
+  const newUser = {
+    username: username,
+    password: hash
+  }
+
+  User.add(newUser)
+  .then(user => {
+    res.status(201).json(user)
+  })
+  .catch(err => {
+    res.status(500).json(err.message)
+  })
+})
+
+/*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
 
@@ -54,6 +92,32 @@ router.post('/login', (req, res) => {
     4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
       the response body should include a string exactly as follows: "invalid credentials".
   */
-});
+
+
+// router.post('/login', checkBody, userNameExists, (req, res, next) => {
+//  if (bcrypt.compareSync(req.body.password)) {
+//   const token = tokenBuilder(req.body)
+//   res.status(200).json({ message: `Welcome, ${req.body.username}`, token})
+//  } else {
+//   next({status: 401, message: 'invalid credentials'})
+//  }
+  
+// });
+
+router.post('/login', checkBody, userNameExists, (req, res) => {
+  let {username, password} = req.body
+  User.findBy({username})
+  .then(([user]) => {
+    if (user && bcrypt.compareSync(password, user.password)) {
+      const token = tokenBuilder(user)
+      res.status(200).json({
+        message: `Welcome, ${req.body.username}`, 
+        token: token
+    })
+  } else {
+    res.status(401).json({message: "invalid credentials"})
+  }
+})
+})
 
 module.exports = router;
