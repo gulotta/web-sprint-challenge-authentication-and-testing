@@ -45,8 +45,11 @@ router.post('/register', checkBody, userNameFree, (req, res) => {
 
   const newUser = {
     username: username,
-    password: hash
+    password: hash,
+    id: req.params.id
   }
+
+  console.log(newUser)
 
   User.add(newUser)
   .then(user => {
