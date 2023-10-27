@@ -104,9 +104,9 @@ router.post('/register', checkBody, userNameFree, (req, res) => {
   
 // });
 
-router.post('/login', checkBody, userNameExists, (req, res) => {
+router.post('/login', checkBody, userNameExists, (req, res, next) => {
   let {username, password} = req.body
-  User.findBy({username})
+  User.findBy(username)
   .then((user) => {
     if (user && bcrypt.compareSync(password, user.password)) {
       const token = tokenBuilder(user)
@@ -115,9 +115,10 @@ router.post('/login', checkBody, userNameExists, (req, res) => {
         token: token
     })
   } else {
-    res.status(401).json({message: "invalid credentials"})
+    next({status: 401, message:"invalid credentials"})
   }
 })
+.catch(next)
 })
 
 module.exports = router;
