@@ -51,12 +51,11 @@ const {tokenBuilder} = require('./auth-helper')
 // });
 
 router.post('/register', checkBody, userNameFree, (req, res) => {
-  const {id, username, password} = req.body
+  const {username, password} = req.body
 
   const hash = bcrypt.hashSync(password, BCRYPT_ROUNDS)
 
   const newUser = {
-    id: id,
     username: username,
     password: hash
   }
@@ -115,7 +114,7 @@ router.post('/login', checkBody, userNameExists, (req, res) => {
         message: `Welcome, ${req.body.username}`, 
         token: token
     })
-  } else if(!username) {
+  } else {
     res.status(401).json({message: "invalid credentials"})
   }
 })
