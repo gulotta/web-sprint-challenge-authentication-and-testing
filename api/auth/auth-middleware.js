@@ -20,12 +20,21 @@ async function userNameFree(req, res, next) {
 }
 
 async function userNameExists(req, res, next) {
+    // try {
+    //     const user = await User.findBy({username: req.body.username})
+    //     !user ? res.status(401).json({message: "invalid credentials"})
+    //     : (req.userFromDb = user)
+    //     next()
+    // } catch(err) {
+    //     next(err)
+    // }
     try {
         const user = await User.findBy({username: req.body.username})
-        !user ? res.status(401).json({message: "invalid credentials"})
-        : (req.userFromDb = user)
+        if(!user) {
+            res.status(401).json({ message: "invalid credentials"})
+        } else req.dbUser = user
         next()
-    } catch(err) {
+    } catch (err) {
         next(err)
     }
 }
