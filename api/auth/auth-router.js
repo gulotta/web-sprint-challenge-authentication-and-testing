@@ -99,9 +99,8 @@ router.post('/login', checkBody, userNameExists, (req, res) => {
       res.status(401).json({message: "invalid credentials"})
   } 
 })
-.catch(err => {
-  res.status(500).json(err)
+ 
 })
-})
+
 
 module.exports = router;
