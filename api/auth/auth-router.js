@@ -1,15 +1,9 @@
 const router = require('express').Router();
 const User = require('../users/users-model')
 const bcrypt = require('bcryptjs')
-const {
-  checkBody,
-  userNameFree,
-  userNameExists
-} = require('./auth-middleware')
+const { checkBody, userNameFree, userNameExists} = require('./auth-middleware')
 const {BCRYPT_ROUNDS} = require('../../config/index')
 const {tokenBuilder} = require('./auth-helper')
-
-
 
 /*
     IMPLEMENT
@@ -36,7 +30,6 @@ const {tokenBuilder} = require('./auth-helper')
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-
 
 router.post('/register', checkBody, userNameFree, (req, res) => {
   const {username, password} = req.body
